@@ -71,7 +71,10 @@ Tải file `TMDB_movie_dataset_v11.csv` từ [Kaggle](https://www.kaggle.com/dat
 ```bash
 python main.py
 ```
+## 📸 Demo
 
+**Kết quả gợi ý**
+![Result](image.png)
 ---
 
 ## 📊 Kết quả mô hình
