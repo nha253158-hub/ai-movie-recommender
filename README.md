@@ -76,14 +76,13 @@ python main.py
 
 ## 📊 Kết quả mô hình
 
-| Mô hình | R² | MAE |
-|---|---|---|
-| Linear Regression | 0.412 | 0.451 |
-| Random Forest | 0.471 | 0.433 |
-| **Gradient Boosting** | **0.485** | **0.426** |
+| Mô hình | R² | MAE | RMSE |
+|---|---|---|---|
+| Linear Regression | 0.507 | 0.421 | 0.563 |
+| Random Forest | 0.577 | 0.399 | 0.521 |
+| **Gradient Boosting** | **0.618** | **0.376** | **0.495** |
 
-> Gradient Boosting cho kết quả tốt nhất với R² = 0.485 và MAE = 0.426 trên tập test.
-
+> Gradient Boosting cho kết quả tốt nhất với R² = 0.618 và MAE = 0.376 trên tập test (thang điểm 0–10).
 ---
 
 
