@@ -31,7 +31,14 @@ def build_candidates(random_state: int) -> dict:
         "Random Forest": RandomForestRegressor(
             n_estimators=200, random_state=random_state, n_jobs=-1
         ),
-        "Gradient Boosting": HistGradientBoostingRegressor(random_state=random_state),
+        "Gradient Boosting": HistGradientBoostingRegressor(
+            random_state=random_state,
+            max_iter=500,
+            learning_rate=0.05,
+            max_depth=6,
+            min_samples_leaf=20,
+            l2_regularization=0.1,
+        ),
     }
 
 
@@ -99,10 +106,13 @@ class RecommenderModel:
         row = {col: 0.0 for col in self.data.feature_columns}
         row["runtime"] = float(runtime)
         row["release_year"] = float(release_year)
-        # Use medians for fields the user doesn't control, to reduce noise.
-        row["popularity"] = float(self.data.df["popularity"].median())
-        row["vote_count"] = float(self.data.df["vote_count"].median())
-
+        row["log_budget"] = float(np.log1p(self.data.df["budget"].median()))
+        row["log_revenue"] = float(np.log1p(self.data.df["revenue"].median()))
+        row["log_popularity"] = float(np.log1p(self.data.df["popularity"].median()))
+        row["log_vote_count"] = float(np.log1p(self.data.df["vote_count"].median()))
+        row["budget_per_minute"] = float(self.data.df["budget"].median() / (float(runtime) + 1))
+        row["revenue_budget_ratio"] = float(self.data.df["revenue"].median() / (self.data.df["budget"].median() + 1))
+        
         genre_col = f"genres_{genre}"
         country_col = f"production_countries_{country}"
         if genre_col in row:
@@ -112,7 +122,6 @@ class RecommenderModel:
 
         vector = [row[col] for col in self.data.feature_columns]
         return np.array(vector, dtype=float).reshape(1, -1)
-
     def predict_rating(self, runtime, release_year, genre, country) -> float:
         """Predict the expected vote average using the best model."""
         scaled = self.scaler.transform(

@@ -1,6 +1,7 @@
 """Dataset loading, cleaning, and feature encoding."""
 
 from __future__ import annotations
+import numpy as np
 
 import pandas as pd
 from . import config
@@ -47,7 +48,12 @@ class MovieData:
 
     def _preprocess(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.dropna()
-
+        # Lọc budget/revenue hợp lệ
+        df = df[df["budget"] > 0]
+        df = df[df["revenue"] > 0]
+        
+        top_langs = df["original_language"].value_counts().nlargest(10).index
+        df = df[df["original_language"].isin(top_langs)]
         # Quality filters: enough votes and an actual rating.
         df = df[df["vote_count"] > config.MIN_VOTE_COUNT]
         df = df[df["vote_average"] > config.MIN_VOTE_AVERAGE]
@@ -73,7 +79,17 @@ class MovieData:
             df["genres"].isin(top_genres)
             & df["production_countries"].isin(top_countries)
         ]
+        df["num_languages"] = df["spoken_languages"].apply(
+        lambda x: len(str(x).split(",")) if pd.notna(x) else 1
+        )
+        
+        df["log_budget"] = np.log1p(df["budget"])
+        df["log_revenue"] = np.log1p(df["revenue"])
+        df["log_popularity"] = np.log1p(df["popularity"])
+        df["log_vote_count"] = np.log1p(df["vote_count"])
 
+        df["budget_per_minute"] = df["budget"] / (df["runtime"] + 1)
+        df["revenue_budget_ratio"] = df["revenue"] / (df["budget"] + 1)
         return df.reset_index(drop=True)
 
     def _build_features(self) -> None:

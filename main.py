@@ -32,7 +32,17 @@ def main() -> None:
         )
     )
     print(f"\nBest model: {recommender.best_name}\n")
+    from sklearn.inspection import permutation_importance
+    import pandas as pd
 
+    X = recommender.data.features.values.astype(float)
+    y = recommender.data.df["vote_average"].values.astype(float)
+    X_scaled = recommender.scaler.transform(X)
+
+    result = permutation_importance(recommender.best_model, X_scaled, y, n_repeats=10, random_state=42)
+    importances = pd.Series(result.importances_mean, index=recommender.data.feature_columns)
+    print("\nTop 10 feature importances:")
+    print(importances.nlargest(10).to_string())
     MovieApp(recommender).mainloop()
 
 
