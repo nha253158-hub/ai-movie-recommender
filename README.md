@@ -86,7 +86,4 @@ python main.py
 
 ---
 
-## 👩‍💻 Tác giả
 
-**Nguyễn Thu Hà** — Sinh viên năm 3, Khoa Vật lý, ĐHKHTN – ĐHQGHN  
-📧 Liên hệ qua GitHub Issues
